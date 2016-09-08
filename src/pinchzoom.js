@@ -37,33 +37,33 @@
          * @constructor
          */
         var PinchZoom = function (el, options) {
-                this.el = $(el);
-                this.zoomFactor = 1;
-                this.lastScale = 1;
-                this.offset = {
-                    x: 0,
-                    y: 0
-                };
-                this.options = $.extend({}, this.defaults, options);
-                this.setupMarkup();
-                this.bindEvents();
-                this.update();
-                // default enable.
-                this.enable();
-
-            },
-            sum = function (a, b) {
-                return a + b;
-            },
-            isCloseTo = function (value, expected) {
-                return value > expected - 0.01 && value < expected + 0.01;
+            this.el = $(el);
+            this.zoomFactor = 1;
+            this.lastScale = 1;
+            this.offset = {
+                x: 0,
+                y: 0
             };
+            this.options = $.extend({}, this.defaults, options);
+            this.setupMarkup();
+            this.bindEvents();
+            this.update();
+            // default enable.
+            this.enable();
+
+        },
+        sum = function (a, b) {
+            return a + b;
+        },
+        isCloseTo = function (value, expected) {
+            return value > expected - 0.01 && value < expected + 0.01;
+        };
 
         PinchZoom.prototype = {
 
             defaults: {
                 tapZoomFactor: 2,
-                zoomOutFactor: 1.3,
+                zoomOutFactor: 1,
                 animationDuration: 300,
                 maxZoom: 4,
                 minZoom: 0.5,
@@ -74,6 +74,11 @@
                 dragStartEventName: 'pz_dragstart',
                 dragEndEventName: 'pz_dragend',
                 doubleTapEventName: 'pz_doubletap'
+            },
+
+            reset: function () {
+                this.zoomFactor = this.lastScale = 1;
+                this.offset.x = this.offset.y = 0;
             },
 
             /**
@@ -359,7 +364,20 @@
                 // use .offsetWidth instead of width()
                 // because jQuery-width() return the original width but Zepto-width() will calculate width with transform.
                 // the same as .height()
-                return this.container[0].offsetWidth / this.el[0].offsetWidth;
+                var widthFactor = this.container[0].offsetWidth / this.el[0].offsetWidth,
+                    heightFactor = this.container[0].offsetHeight / this.el[0].offsetHeight,
+                    zoomFactor = Math.min(widthFactor, heightFactor);
+                return widthFactor < heightFactor ? {
+                    adjustY: true,
+                    zoomFactor: zoomFactor,
+                    offsetX: 0,
+                    offsetY: (this.container[0].offsetHeight / zoomFactor - this.el[0].offsetHeight) / 2
+                } : {
+                    adjustX: true,
+                    zoomFactor: zoomFactor,
+                    offsetX: (this.container[0].offsetWidth / zoomFactor - this.el[0].offsetWidth) / 2,
+                    offsetY: 0
+                }
             },
 
             /**
@@ -536,12 +554,58 @@
 
                 setTimeout((function () {
                     this.updatePlaned = false;
-                    this.updateAspectRatio();
+                    //this.updateAspectRatio();
 
-                    var zoomFactor = this.getInitialZoomFactor() * this.zoomFactor,
-                        offsetX = -this.offset.x / zoomFactor,
-                        offsetY = -this.offset.y / zoomFactor,
-                        transform3d =   'scale3d('     + zoomFactor + ', '  + zoomFactor + ',1) ' +
+                    var factor = this.getInitialZoomFactor(),
+                        zoomFactor = factor.zoomFactor * this.zoomFactor,
+                        offsetX = -this.offset.x / zoomFactor + factor.offsetX,
+                        offsetY = -this.offset.y / zoomFactor + factor.offsetY,
+                        dispWidth = this.el[0].offsetWidth * zoomFactor,
+                        dispHeight = this.el[0].offsetHeight * zoomFactor,
+                        containerWidth = this.container[0].offsetWidth,
+                        containerHeight = this.container[0].offsetHeight;
+
+                    // 宽度
+                    if (factor.adjustX) {
+                        if (dispWidth > containerWidth) {
+                            // 图比容器宽
+                            if (offsetX > 0) {
+                                // 限制移动左边界
+                                offsetX = 0;
+                                this.offset.x = factor.offsetX * zoomFactor;
+                            } else if (offsetX < (containerWidth - dispWidth) / zoomFactor) {
+                                // 限制移动右边界
+                                offsetX = (containerWidth - dispWidth) / zoomFactor;
+                                this.offset.x = factor.offsetX * zoomFactor + dispWidth - containerWidth;
+                            }
+                        } else {
+                            // 图比容器窄，限制左右边界
+                            offsetX = (containerWidth - dispWidth) / 2 / zoomFactor;
+                            this.offset.x = factor.offsetX * zoomFactor + (dispWidth - containerWidth) / 2;
+                        }
+                    }
+
+                    // 高度
+                    if (factor.adjustY) {
+                        if (dispHeight > containerHeight) {
+                            // 图比容器高
+                            if (offsetY > 0) {
+                                // 限制移动上边界
+                                offsetY = 0;
+                                this.offset.y = factor.offsetY * zoomFactor;
+                            } else if (offsetY < (containerHeight - dispHeight) / zoomFactor) {
+                                // 限制移动下边界
+                                offsetY = (containerHeight - dispHeight) / zoomFactor;
+                                this.offset.y = factor.offsetY * zoomFactor + dispHeight - containerHeight;
+                            }
+                        } else {
+                            // 图片比容器矮
+                            offsetY = (containerHeight - dispHeight) / 2 / zoomFactor;
+                            this.offset.y = factor.offsetY * zoomFactor + (dispHeight - containerHeight) / 2;
+                        }
+                    }
+
+                    var transform3d =   'scale3d('     + zoomFactor + ', '  + zoomFactor + ',1) ' +
                             'translate3d(' + offsetX    + 'px,' + offsetY    + 'px,0px)',
                         transform2d =   'scale('       + zoomFactor + ', '  + zoomFactor + ') ' +
                             'translate('   + offsetX    + 'px,' + offsetY    + 'px)',
