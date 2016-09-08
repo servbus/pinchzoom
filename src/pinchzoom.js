@@ -234,27 +234,27 @@
              */
             drag: function (center, lastCenter) {
                 if (lastCenter) {
-                  if(this.options.lockDragAxis) {
-                    // lock scroll to position that was changed the most
-                    if(Math.abs(center.x - lastCenter.x) > Math.abs(center.y - lastCenter.y)) {
-                      this.addOffset({
-                        x: -(center.x - lastCenter.x),
-                        y: 0
-                      });
+                    if (this.options.lockDragAxis) {
+                        // lock scroll to position that was changed the most
+                        if (Math.abs(center.x - lastCenter.x) > Math.abs(center.y - lastCenter.y)) {
+                            this.addOffset({
+                                x: -(center.x - lastCenter.x),
+                                y: 0
+                            });
+                        }
+                        else {
+                            this.addOffset({
+                                y: -(center.y - lastCenter.y),
+                                x: 0
+                            });
+                        }
                     }
                     else {
-                      this.addOffset({
-                        y: -(center.y - lastCenter.y),
-                        x: 0
-                      });
+                        this.addOffset({
+                            y: -(center.y - lastCenter.y),
+                            x: -(center.x - lastCenter.x)
+                        });
                     }
-                  }
-                  else {
-                    this.addOffset({
-                      y: -(center.y - lastCenter.y),
-                      x: -(center.x - lastCenter.x)
-                    });
-                  }
                 }
             },
 
@@ -398,14 +398,14 @@
                 // uses following formula to calculate the zoom center x value
                 // offset_left / offset_right = zoomcenter_x / (container_x - zoomcenter_x)
                 var length = this.container[0].offsetWidth * this.zoomFactor,
-                    offsetLeft  = this.offset.x,
-                    offsetRight = length - offsetLeft -this.container[0].offsetWidth,
+                    offsetLeft = this.offset.x,
+                    offsetRight = length - offsetLeft - this.container[0].offsetWidth,
                     widthOffsetRatio = offsetLeft / offsetRight,
                     centerX = widthOffsetRatio * this.container[0].offsetWidth / (widthOffsetRatio + 1),
 
                 // the same for the zoomcenter y
                     height = this.container[0].offsetHeight * this.zoomFactor,
-                    offsetTop  = this.offset.y,
+                    offsetTop = this.offset.y,
                     offsetBottom = height - offsetTop - this.container[0].offsetHeight,
                     heightOffsetRatio = offsetTop / offsetBottom,
                     centerY = heightOffsetRatio * this.container[0].offsetHeight / (heightOffsetRatio + 1);
@@ -487,7 +487,7 @@
              * @return {Number}
              */
             swing: function (p) {
-                return -Math.cos(p * Math.PI) / 2  + 0.5;
+                return -Math.cos(p * Math.PI) / 2 + 0.5;
             },
 
             getContainerX: function () {
@@ -605,10 +605,10 @@
                         }
                     }
 
-                    var transform3d =   'scale3d('     + zoomFactor + ', '  + zoomFactor + ',1) ' +
-                            'translate3d(' + offsetX    + 'px,' + offsetY    + 'px,0px)',
-                        transform2d =   'scale('       + zoomFactor + ', '  + zoomFactor + ') ' +
-                            'translate('   + offsetX    + 'px,' + offsetY    + 'px)',
+                    var transform3d = 'scale3d(' + zoomFactor + ', ' + zoomFactor + ',1) ' +
+                            'translate3d(' + offsetX + 'px,' + offsetY + 'px,0px)',
+                        transform2d = 'scale(' + zoomFactor + ', ' + zoomFactor + ') ' +
+                            'translate(' + offsetX + 'px,' + offsetY + 'px)',
                         removeClone = (function () {
                             if (this.clone) {
                                 this.clone.remove();
@@ -624,11 +624,11 @@
                         this.is3d = true;
                         removeClone();
                         this.el.css({
-                            '-webkit-transform':  transform3d,
-                            '-o-transform':       transform2d,
-                            '-ms-transform':      transform2d,
-                            '-moz-transform':     transform2d,
-                            'transform':        transform3d
+                            '-webkit-transform': transform3d,
+                            '-o-transform': transform2d,
+                            '-ms-transform': transform2d,
+                            '-moz-transform': transform2d,
+                            'transform': transform3d
                         });
                     } else {
 
@@ -642,11 +642,11 @@
                             setTimeout(removeClone, 200);
                         }
                         this.el.css({
-                            '-webkit-transform':  transform2d,
-                            '-o-transform':       transform2d,
-                            '-ms-transform':      transform2d,
-                            '-moz-transform':     transform2d,
-                            'transform':        transform2d
+                            '-webkit-transform': transform2d,
+                            '-o-transform': transform2d,
+                            '-ms-transform': transform2d,
+                            '-moz-transform': transform2d,
+                            'transform': transform2d
                         });
                         this.is3d = false;
                     }
@@ -656,15 +656,15 @@
             /**
              * Enables event handling for gestures
              */
-            enable: function() {
-              this.enabled = true;
+            enable: function () {
+                this.enabled = true;
             },
 
             /**
              * Disables event handling for gestures
              */
-            disable: function() {
-              this.enabled = false;
+            disable: function () {
+                this.enabled = false;
             }
         };
 
@@ -765,7 +765,7 @@
                 firstMove = true;
 
             el.addEventListener('touchstart', function (event) {
-                if(target.enabled) {
+                if (target.enabled) {
                     firstMove = true;
                     fingers = event.touches.length;
                     detectDoubleTap(event);
@@ -773,7 +773,7 @@
             });
 
             el.addEventListener('touchmove', function (event) {
-                if(target.enabled) {
+                if (target.enabled) {
                     if (firstMove) {
                         updateInteraction(event);
                         if (interaction) {
@@ -800,7 +800,7 @@
             });
 
             el.addEventListener('touchend', function (event) {
-                if(target.enabled) {
+                if (target.enabled) {
                     fingers = event.touches.length;
                     updateInteraction(event);
                 }
