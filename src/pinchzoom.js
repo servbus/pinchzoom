@@ -250,10 +250,35 @@
                         }
                     }
                     else {
-                        this.addOffset({
+                        var tmpOffset = {
                             y: -(center.y - lastCenter.y),
                             x: -(center.x - lastCenter.x)
-                        });
+                        };
+
+                        switch (this.rotateAngle) {
+                            case 90:
+                                var tmp = tmpOffset.y;
+                                tmpOffset.y = -tmpOffset.x;
+                                tmpOffset.x = tmp;
+                                break;
+
+                            case 180:
+                                tmpOffset.x = -tmpOffset.x;
+                                tmpOffset.y = -tmpOffset.y;
+                                break;
+
+                            case 270:
+                                var tmp = tmpOffset.y;
+                                tmpOffset.y = tmpOffset.x;
+                                tmpOffset.x = -tmp;
+                                break;
+
+                            default:
+
+                        }
+
+                        this.addOffset(tmpOffset);
+
                     }
                 }
             },

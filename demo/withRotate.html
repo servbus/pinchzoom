@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <script type="text/javascript" src="../dependencies/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="../src/pinchzoom.js"></script>
+
+    <style>
+        * {
+            height: 100%;
+        }
+
+        .rotateContainer {
+            transform: rotate(90deg);
+        }
+    </style>
+
+    <script>
+        $(function () {
+            var pinchImg = new RTP.PinchZoom($(".rotateContainer img"), {});
+            pinchImg.rotateAngle = 90;
+            $(".pinch-zoom-container").css({ height: "100%", width: "100%" });
+        })
+    </script>
+</head>
+<body>
+    <div>
+        <div class="rotateContainer">
+            <img src="cat.jpg" />
+        </div>
+
+    </div>
+</body>
+</html>
