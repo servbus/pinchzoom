@@ -536,7 +536,6 @@
                 this.container.append(this.el);
 
                 this.container.css({
-                    'overflow': 'hidden',
                     'position': 'relative'
                 });
 
