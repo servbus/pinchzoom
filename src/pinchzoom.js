@@ -79,6 +79,7 @@
             reset: function () {
                 this.zoomFactor = this.lastScale = 1;
                 this.offset.x = this.offset.y = 0;
+                this.update();
             },
 
             /**
